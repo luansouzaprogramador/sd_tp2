@@ -25,30 +25,38 @@ int meta_load(const char *path, Meta *m) {
     if (!f) return -1;
     char line[512];
     unsigned long long fsz = 0;
-    int got = 0, in_blocks = 0;
+    int in_blocks = 0;
+    int has_name = 0, has_size = 0, has_bs = 0, has_nb = 0, has_sha = 0;
+
     if (!fgets(line, sizeof line, f) || strncmp(line, "P2PMETA 1", 9) != 0) goto fail;
+    
     while (fgets(line, sizeof line, f)) {
         line[strcspn(line, "\r\n")] = '\0';
-        if (sscanf(line, "filename %255[^\n]", m->filename) == 1) got |= 1;
-        else if (sscanf(line, "filesize %llu", &fsz) == 1) got |= 2;
-        else if (sscanf(line, "blocksize %u", &m->blocksize) == 1) got |= 4;
-        else if (sscanf(line, "numblocks %u", &m->numblocks) == 1) got |= 8;
+        if (sscanf(line, "filename %255[^\n]", m->filename) == 1) has_name = 1;
+        else if (sscanf(line, "filesize %llu", &fsz) == 1) has_size = 1;
+        else if (sscanf(line, "blocksize %u", &m->blocksize) == 1) has_bs = 1;
+        else if (sscanf(line, "numblocks %u", &m->numblocks) == 1) has_nb = 1;
         else if (strncmp(line, "sha256 ", 7) == 0) {
             if (hex_decode(line + 7, m->file_hash, 32) != 0) goto fail;
-            got |= 16;
+            has_sha = 1;
         } else if (strcmp(line, "blocks") == 0) { in_blocks = 1; break; }
     }
-    if (!in_blocks || got != 31) goto fail;
+
+    if (!in_blocks || !has_name || !has_size || !has_bs || !has_nb || !has_sha) goto fail;
+    
     m->filesize = fsz;
     if (m->blocksize == 0 || m->filesize == 0 || strchr(m->filename, '/')) goto fail;
     if (m->numblocks != (uint32_t)((m->filesize + m->blocksize - 1) / m->blocksize)) goto fail;
+    
     m->block_hash = calloc(m->numblocks, 32);
     if (!m->block_hash) goto fail;
+    
     for (uint32_t i = 0; i < m->numblocks; i++) {
         if (!fgets(line, sizeof line, f) || hex_decode(line, m->block_hash[i], 32) != 0) goto fail;
     }
     fclose(f);
     return 0;
+
 fail:
     fclose(f);
     meta_free(m);
