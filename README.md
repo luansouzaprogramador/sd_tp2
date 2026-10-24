@@ -8,9 +8,14 @@ Para compilar e executar o núcleo do sistema (C):
 *   `gcc`, `make`, `bash`, `sha256sum` (coreutils)
 *   *Nenhuma biblioteca externa é necessária para o C (o SHA-256 é implementado do zero).*
 
-Para gerar os gráficos do relatório (Opcional):
+Para gerar os gráficos do relatório:
 *   `python3`, `pip`
-*   Bibliotecas: `pandas`, `matplotlib`, `seaborn` (`pip install pandas matplotlib seaborn`)
+*   Bibliotecas listadas no arquivo `requirements.txt` (`pandas`, `matplotlib`, `seaborn`). Para instalá-las, execute:
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate
+    pip install -r requirements.txt
+    ```
 
 ## Estrutura do Projeto
 
@@ -18,6 +23,7 @@ Para gerar os gráficos do relatório (Opcional):
 p2p-transfer/
 ├── Makefile
 ├── README.md
+├── requirements.txt
 ├── include/       # Cabeçalhos (.h)
 │   ├── sha256.h
 │   ├── meta.h
@@ -31,15 +37,17 @@ p2p-transfer/
 │   ├── protocol.c # Empacotamento de mensagens TCP
 │   └── util.c     # Funções auxiliares (tempo, hex)
 ├── scripts/       # Automação de testes
-│   ├── run_test.sh  # Executa um cenário específico
-│   ├── run_all.sh   # Executa a matriz completa (Tabela 1)
-│   └── clean.sh     # Limpa pastas temporárias
+│   ├── run_test.sh      # Executa um cenário específico
+│   ├── run_all.sh       # Executa a matriz completa (Tabela 1)
+│   ├── run_benchmark.sh # Executa a matriz 5 vezes para média estatística
+│   └── clean.sh         # Limpa pastas temporárias
 ├── tools/         # Ferramentas de análise (não fazem parte do executável)
-│   └── plot_results.py # Gera os gráficos a partir do results.csv
+│   ├── plot_results.py    # Gera gráficos a partir das médias
+│   └── average_results.py # Calcula média e desvio padrão das rodadas
 ├── data/          # Arquivos binários de teste gerados
 ├── work/          # Diretório de cada peer durante os testes (gerado)
 ├── logs/          # Logs detalhados de cada peer (gerado)
-└── results/       # results.csv e gráficos .png (gerado)
+└── results/       # results.csv, médias e gráficos .png (gerado)
 ```
 
 ## Como Compilar
@@ -50,60 +58,55 @@ make
 ```
 Isso gerará os binários `build/peer` e `build/mkmeta`.
 
-## Uso Manual (Exemplo com 3 terminais)
+## Execução dos Testes
 
-**1. Preparar arquivo e metadados:**
-```bash
-head -c 1048576 /dev/urandom > data/arquivo.bin
-build/mkmeta data/arquivo.bin 1024 data/arquivo.meta
-mkdir -p work/A work/B work/C
-cp data/arquivo.bin work/A/  # A é o Seeder inicial
-```
+O projeto oferece duas formas de execução, dependendo do objetivo da análise.
 
-**2. Iniciar os Peers:**
-```bash
-# Terminal 1 (Seeder A)
-build/peer --id A --port 7000 --meta data/arquivo.meta --dir work/A --neighbors 127.0.0.1:7001,127.0.0.1:7002
-
-# Terminal 2 (Leecher B)
-build/peer --id B --port 7001 --meta data/arquivo.meta --dir work/B --neighbors 127.0.0.1:7000,127.0.0.1:7002
-
-# Terminal 3 (Leecher C)
-build/peer --id C --port 7002 --meta data/arquivo.meta --dir work/C --neighbors 127.0.0.1:7000,127.0.0.1:7001
-```
-
-**Opções do binário `peer`:**
-*   `--ip`: Endereço de escuta (padrão: 127.0.0.1).
-*   `--log ARQ`: Grava o log num arquivo específico.
-*   `--linger SEG`: Segundos que o peer continua servindo após completar o download (padrão: infinito).
-*   `--quiet`: Oculta mensagens de recebimento/envio de blocos no terminal.
-
-O arquivo final aparece em `work/<peer>/arquivo.bin`. Durante o download, os dados ficam em `arquivo.bin.part`.
-
-## Testes Automatizados (Scripts)
-
-O script `run_test.sh` automatiza todo o processo: gera arquivo, cria metadados, sobe os peers, espera terminarem, valida a integridade (SHA-256) e extrai métricas.
+### Opção 1: Execução Rápida (Matriz Completa - 1 Rodada)
+Ideal para validar o funcionamento do código e visualizar os resultados brutos rapidamente.
 
 ```bash
-# Teste único: <peers> <tam_bloco> <tam_arquivo> [mesh|line] [rotulo]
-bash scripts/run_test.sh 4 1024 1048576 mesh FileB
+# 1. Compilar e dar permissão aos scripts
+make clean && make
+chmod +x scripts/*.sh
 
-# Matriz completa da Tabela 1 (demora alguns minutos)
+# 2. Rodar a matriz completa da Tabela 1
 bash scripts/run_all.sh
+
+# 3. Visualizar a tabela de resultados no terminal
+column -s, -t results/results.csv
 ```
 
-**Topologias de teste:**
-*   `mesh`: Todos os peers são vizinhos entre si (malha completa, P2P real).
-*   `line`: Peers conectados em cadeia A-B-C-D (gera gargalo sequencial).
+*(Nota: Nesta opção, o script `plot_results.py` não deve ser executado, pois ele depende do arquivo de médias gerado na Opção 2).*
 
-## Gerando Gráficos para o Relatório
-
-Após rodar os testes, utilize o script Python para transformar o `results/results.csv` em gráficos prontos para o PDF:
+### Opção 2: Benchmark Estatístico (5 Rodadas + Gráficos)
+Recomendado para gerar os dados finais do relatório. Como o ambiente WSL sofre com *jitter* (variações de escalonamento de CPU e I/O), rodar a matriz 5 vezes permite calcular a **média** e o **desvio padrão**, gerando gráficos confiáveis com barras de erro.
 
 ```bash
+# 1. Compilar e dar permissão aos scripts
+make clean && make
+chmod +x scripts/*.sh
+chmod +x scripts/run_benchmark.sh
+
+# 2. Ativar o ambiente virtual e instalar dependências (se ainda não fez)
+source venv/bin/activate
+pip install -r requirements.txt
+
+# 3. Rodar o benchmark (5 vezes)
+bash scripts/run_benchmark.sh 5
+
+# 4. Calcular as médias das 5 rodadas
+python tools/average_results.py
+
+# 5. Gerar os gráficos finais com barras de erro
 python tools/plot_results.py
 ```
+
 As imagens `.png` serão salvas automaticamente na pasta `results/`.
+
+**Topologias de teste utilizadas nos scripts:**
+*   `mesh`: Todos os peers são vizinhos entre si (malha completa, P2P real).
+*   `line`: Peers conectados em cadeia A-B-C-D (gera gargalo sequencial, usado para comprovar a eficiência da malha).
 
 ## Detalhes do Protocolo TCP
 
