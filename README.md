@@ -120,7 +120,7 @@ Mensagens implementadas:
 
 O arquivo `.meta` (similar a um `.torrent`) possui formato texto: nome do arquivo, tamanho, tamanho do bloco, número de blocos, SHA-256 do arquivo inteiro e uma lista com o SHA-256 de cada bloco.
 
-## Decisões de Projeto e Arquitetura (Para o Relatório)
+## Decisões de Projeto e Arquitetura
 
 *   **Simetria Real**: O processo principal cria uma thread de `accept` (servidor) e uma thread para cada vizinho configurado (cliente).
 *   **Sem Tracker**: A lista de vizinhos é estática (`--neighbors`), eliminando a necessidade de um servidor central.
