@@ -1,0 +1,23 @@
+# Compilação e binários
+build/
+*.o
+*.d
+peer
+mkmeta
+
+# Arquivos gerados pelos testes
+work/
+logs/
+data/
+results/*.csv
+results/*.png
+
+# Ambiente virtual Python
+venv/
+__pycache__/
+*.pyc
+
+# Sistema Operacional e Editores
+.DS_Store
+.vscode/
+.idea/
