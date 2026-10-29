@@ -27,3 +27,7 @@ os.makedirs('results', exist_ok=True)
 df_avg.to_csv('results/results_avg.csv', index=False)
 print("✅ Média das rodadas salva em: results/results_avg.csv")
 print(df_avg.head(10)) # Mostra os primeiros 10 para conferir
+
+# Gera a imagem da tabela logo depois do CSV
+from csv_to_png import csv_to_png
+print(f"✅ Tabela de médias salva em: {csv_to_png('results/results_avg.csv')}")

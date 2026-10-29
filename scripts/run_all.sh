@@ -20,4 +20,9 @@ for np in 2 4; do
   done
 done
 echo; echo "Resultados em results/results.csv"; column -s, -t results/results.csv 2>/dev/null
+# imagens logo depois do CSV (precisam de pandas/matplotlib: requirements.txt)
+python3 tools/csv_to_png.py results/results.csv || echo "(PNG da tabela nao gerado: instale requirements.txt)"
+# o mesmo texto que o `column` mostra no terminal, como PNG
+column -s, -t results/results.csv > results/results_column.txt 2>/dev/null
+python3 tools/text_to_png.py results/results_column.txt || echo "(PNG do column nao gerado: instale requirements.txt)"
 exit $fail
