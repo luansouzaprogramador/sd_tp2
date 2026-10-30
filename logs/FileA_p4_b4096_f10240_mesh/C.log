@@ -1,0 +1,14 @@
+[    0.025] [C] [INFO ] peer C em 127.0.0.1:7002, 3 vizinho(s) configurado(s)
+[    0.038] [C] [INFO ] LEECHER: 0/3 blocos (blocos de 4096 B, 10240 bytes)
+[    0.039] [C] [INFO ] servidor escutando em 127.0.0.1:7002
+[    0.041] [C] [INFO ] conectado ao vizinho 127.0.0.1:7001
+[    0.042] [C] [INFO ] conectado ao vizinho 127.0.0.1:7000
+[    0.045] [C] [INFO ] conexao recebida de D (127.0.0.1:36058)
+[    0.080] [C] [INFO ] DOWNLOAD COMPLETO: arquivo=file_10240.bin bytes=10240 tempo=0.041s taxa=0.24MB/s sha256=OK
+[    0.081] [C] [INFO ]   origem 127.0.0.1:7000 -> 1 blocos (33.3%), 4096 bytes
+[    0.082] [C] [INFO ]   origem 127.0.0.1:7001 -> 2 blocos (66.7%), 6144 bytes
+[    0.084] [C] [INFO ]   origem 127.0.0.1:7003 -> 0 blocos (0.0%), 0 bytes
+[    0.140] [C] [INFO ] agora atuando como SEEDER do arquivo completo
+[    0.271] [C] [INFO ] conexao recebida de B (127.0.0.1:36072)
+[    0.291] [C] [INFO ] conectado ao vizinho 127.0.0.1:7003
+[    1.081] [C] [INFO ] encerrando: blocos servidos=1 (4096 bytes)

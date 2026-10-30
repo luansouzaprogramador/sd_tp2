@@ -1,0 +1,7 @@
+[    0.019] [A] [INFO ] peer A em 127.0.0.1:7000, 3 vizinho(s) configurado(s)
+[    0.031] [A] [INFO ] SEEDER: arquivo completo (1280 blocos, 5242880 bytes)
+[    0.031] [A] [INFO ] servidor escutando em 127.0.0.1:7000
+[    0.549] [A] [INFO ] conexao recebida de B (127.0.0.1:55894)
+[    0.565] [A] [INFO ] conexao recebida de C (127.0.0.1:55900)
+[    0.569] [A] [INFO ] conexao recebida de D (127.0.0.1:55914)
+[    2.778] [A] [INFO ] encerrando: blocos servidos=3678 (15065088 bytes)
