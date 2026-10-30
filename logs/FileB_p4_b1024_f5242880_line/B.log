@@ -1,0 +1,11 @@
+[    0.063] [B] [INFO ] peer B em 127.0.0.1:7001, 2 vizinho(s) configurado(s)
+[    0.071] [B] [INFO ] LEECHER: 0/5120 blocos (blocos de 1024 B, 5242880 bytes)
+[    0.072] [B] [INFO ] servidor escutando em 127.0.0.1:7001
+[    0.074] [B] [INFO ] conectado ao vizinho 127.0.0.1:7000
+[    0.080] [B] [INFO ] conexao recebida de C (127.0.0.1:52952)
+[    0.325] [B] [INFO ] conectado ao vizinho 127.0.0.1:7002
+[    4.135] [B] [INFO ] DOWNLOAD COMPLETO: arquivo=file_5242880.bin bytes=5242880 tempo=4.061s taxa=1.23MB/s sha256=OK
+[    4.135] [B] [INFO ]   origem 127.0.0.1:7000 -> 5120 blocos (100.0%), 5242880 bytes
+[    4.136] [B] [INFO ]   origem 127.0.0.1:7002 -> 0 blocos (0.0%), 0 bytes
+[    4.179] [B] [INFO ] agora atuando como SEEDER do arquivo completo
+[    5.357] [B] [INFO ] encerrando: blocos servidos=5120 (5242880 bytes)
